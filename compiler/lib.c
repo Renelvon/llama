@@ -1,5 +1,6 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <math.h> 
 
 typedef void unit;
 
@@ -59,7 +60,15 @@ unit read_string(char* s, int n){
             s[i] = temp;
     }
 }
-        
+
+int abs(int n){
+    return abs(n);
+}
+
+double fabs(double n){
+    return fabs(n);
+}
+
 unit incr(int *n){
     (*n)++;
 }
