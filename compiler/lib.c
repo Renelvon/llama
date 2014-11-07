@@ -69,6 +69,38 @@ double fabs(double n){
     return fabs(n);
 }
 
+double sqrt(double n){
+    return sqrt(n);
+}
+
+double sin(double n){
+    return sin(n);
+}
+
+double cos(double n){
+    return cos(n);
+}
+
+double tan(double n){
+    return tan(n);
+}
+
+double atan(double n){
+    return atan(n);
+}
+
+double exp(double n){
+    return exp(n);
+}
+
+double ln(double n){
+    return log(n);
+}
+
+double pi(){
+    return M_PI;
+}
+
 unit incr(int *n){
     (*n)++;
 }
@@ -84,4 +116,17 @@ double float_of_int(int n){
 int int_of_float(double d){
     return (double)d;
 }
+
+int round(double n){
+    return (int)round(n);
+}
+
+int int_of_char(char c){
+    return (int)c;
+}
+
+char char_of_int(int n){
+    return (char)n;
+}
+
 
