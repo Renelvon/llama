@@ -122,17 +122,10 @@ class Analyzer:
     def _dispatch(self, node):
         self._dispatcher[type(node)](node)
 
-    def _insert_symbol(self, sym):
-        try:
-            self.symbol_table.insert_symbol(sym)
-        except symbol.SymbolError as e:
-            self.logger.error(str(e))
+    def analyze(self, code_ast):
+        self.analyze_program(code_ast)
 
-    def _insert_symbols(self, symbols):
-        for sym in symbols:
-            self._insert_symbol(sym)
-
-    def analyze(self, program):
+    def analyze_program(self, program):
         for definition in program:
             self._dispatch(definition)
 
