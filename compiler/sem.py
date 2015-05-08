@@ -24,16 +24,25 @@ class Analyzer:
         else:
             self.logger = logger
 
+        self._initialize_dispatchers()
+
+    def _initialize_dispatchers(self):
+        self._initialize_general_dispatcher()
+        self._initialize_unop_dispatcher()
+        self._initialize_binop_dispatcher()
+
+    def _initialize_general_dispatcher(self):
         self._dispatcher = {
             ast.Program: self.analyze,
             ast.LetDef: self.analyze_letdef,
+            ast.TypeDef: self.analyze_typedef,
             ast.ConstantDef: self.analyze_constant_def,
             ast.FunctionDef: self.analyze_function_def,
             ast.VariableDef: self.analyze_variable_def,
             ast.ArrayVariableDef: self.analyze_array_variable_def,
             ast.Param: self.analyze_param,
-            ast.BinaryExpression: self.analyze_binary_expression,
             ast.UnaryExpression: self.analyze_unary_expression,
+            ast.BinaryExpression: self.analyze_binary_expression,
             ast.ConstructorCallExpression:
                 self.analyze_constructor_call_expression,
             ast.ArrayExpression: self.analyze_array_expression,
@@ -54,12 +63,12 @@ class Analyzer:
             ast.Pattern: self.analyze_pattern,
             ast.GenidPattern: self.analyze_genid_pattern,
 
-            list: self.analyze_typedef,  # TODO: Redo ast.TypeDef?
             # NOTE: Some ast nodes are omitted, as they are
             # processed elsewhere. These include type annotations as
             # well as type declarations.
         }
 
+    def _initialize_unop_dispatcher(self):
         self._unop_dispatcher = {
             "!": self.analyze_bang_expression,
 
@@ -70,6 +79,38 @@ class Analyzer:
 
             "+.": self.analyze_float_sign_expression,
             "-.": self.analyze_float_sign_expression
+        }
+
+    def _initialize_binop_dispatcher(self):
+        self._binop_dispatcher = {
+            "+": self.analyze_int_binop_expression,
+            "-": self.analyze_int_binop_expression,
+            "*": self.analyze_int_binop_expression,
+            "/": self.analyze_int_binop_expression,
+            "mod": self.analyze_int_binop_expression,
+
+            "+.": self.analyze_float_binop_expression,
+            "-.": self.analyze_float_binop_expression,
+            "*.": self.analyze_float_binop_expression,
+            "/.": self.analyze_float_binop_expression,
+            "**": self.analyze_float_binop_expression,
+
+            "=": self.analyze_eq_binop_expression,
+            "<>": self.analyze_eq_binop_expression,
+
+            "==": self.analyze_nateq_binop_expression,
+            "!=": self.analyze_nateq_binop_expression,
+
+            "<": self.analyze_cmp_binop_expression,
+            "<=": self.analyze_cmp_binop_expression,
+            ">": self.analyze_cmp_binop_expression,
+            ">=": self.analyze_cmp_binop_expression,
+
+            "||": self.analyze_bool_binop_expression,
+            "&&": self.analyze_bool_binop_expression,
+
+            ";": self.analyze_semicolon_expression,
+            ":=": self.analyze_assign_expression
         }
 
     def _dispatch(self, node):
