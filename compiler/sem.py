@@ -179,13 +179,20 @@ class Analyzer:
         self._dispatch(definition.body)
 
     def analyze_function_def(self, definition):
-        scope = self.symbol_table.open_scope()
-        assert scope.visible, "New scope is invisible."
-        self._insert_symbols(definition.params)
+        fun_type = self.inferer.get_type_handle(definition.body)
+        for param in reversed(definition.arguments):
+            fun_type = ast.Function(
+                self.inferer.get_type_handle(param),
+                fun_type
+            )
 
-        for param in definition.params:
+        self.inferer.constrain_node_having_type(definition, fun_type)
+        self.inferer.constrain_node_not_being_function(definition.body)
+
+        new_scope = self._open_visible_scope()
+        self._insert_symbols(definition.arguments)
+        for param in definition.arguments:
             self._dispatch(param)
-
         self._dispatch(definition.body)
         self.symbol_table.close_scope()
 
