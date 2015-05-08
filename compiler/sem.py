@@ -130,19 +130,43 @@ class Analyzer:
             self._dispatch(definition)
 
     def analyze_letdef(self, letdef):
-        scope = self.symbol_table.open_scope()
         if letdef.isRec:
-            assert scope.visible, "New scope is invisible."
-            self._insert_symbols(letdef)
+            self._analyze_rec_letdef(letdef)
         else:
-            scope.visible = False
+            self._analyze_norec_letdef(letdef)
 
+    def _analyze_rec_letdef(letdef):
+        self._open_visible_scope()
+        self._insert_symbols(letdef)
         for definition in letdef:
             self._dispatch(definition)
 
-        if not letdef.isRec:
-            scope.visible = True
-            self._insert_symbols(letdef)
+    def _analyze_norec_letdef(letdef):
+        new_scope = self._open_invisible_scope()
+        for definition in letdef:
+            self._dispatch(definition)
+        new_scope.visible = True
+        self._insert_symbols(letdef)
+
+    def _open_visible_scope(self):
+        new_scope = self.symbol_table.open_scope()
+        assert new_scope.visible, "New scope is invisible."
+        return new_scope
+
+    def _open_invisible_scope(self):
+        new_scope = self.symbol_table.open_scope()
+        new_scope.visible = False
+        return new_scope
+
+    def _insert_symbols(self, symbols):
+        for sym in symbols:
+            self._insert_symbol(sym)
+
+    def _insert_symbol(self, sym):
+        try:
+            self.symbol_table.insert_symbol(sym)
+        except symbol.SymbolError as e:
+            self.logger.error(str(e))
 
     def analyze_typedef(self, typedef):
         try:
