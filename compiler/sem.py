@@ -219,16 +219,23 @@ class Analyzer:
         self._dispatch(expression.operand)
 
     def analyze_bang_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(
+            expression.operand,
+            ast.Ref(self.inferer.get_type_handle(expression))
+        )
 
     def analyze_not_expression(self, expression):
-        pass
+        self._analyze_unop_expression_type1(expression, ast.Bool)
 
     def analyze_int_sign_expression(self, expression):
-        pass
+        self._analyze_unop_expression_type1(expression, ast.Int)
 
     def analyze_float_sign_expression(self, expression):
-        pass
+        self._analyze_unop_expression_type1(expression, ast.Float)
+
+    def _analyze_unop_expression_type1(self, expression, type_factory):
+        self.inferer.constrain_node_having_type(expression, type_factory())
+        self.inferer.constrain_node_having_type(expression.operand, type_factory())
 
     def analyze_binary_expression(self, expression):
         pass
