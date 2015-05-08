@@ -197,7 +197,9 @@ class Analyzer:
         self.symbol_table.close_scope()
 
     def analyze_variable_def(self, definition):
-        pass
+        if definition.type is None:
+            definition.type = ast.Ref(self.inferer.make_new_type())
+        self.inferer.constrain_node_having_type(definition, definition.type)
 
     def analyze_array_variable_def(self, definition):
         pass
