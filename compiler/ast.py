@@ -110,18 +110,38 @@ class Def(NameNode):
     pass
 
 
-class ListNode(collections.abc.Iterable, Node):
+class ArgumentNode(collections.abc.Sequence, Node):
 
     """
-    A node carrying a list of ast nodes.
+    A node that contains a list of arguments, whose count matters.
 
-    Supports iterating through the nodes list.
+    The node may contain other stuff as well.
+    """
+
+    arguments = None
+
+    def __getitem__(self, idx):
+        return self.arguments[idx]
+
+    def __len__(self):
+        return len(self.arguments)
+
+
+class ListNode(collections.abc.Sequence, Node):
+
+    """
+    A node that is in essence just a list of elements.
+
+    The node may not contain other stuff except minor annotations.
     """
 
     list = None
 
-    def __iter__(self):
-        return iter(self.list)
+    def __getitem__(self, idx):
+        return self.list[idx]
+
+    def __len__(self):
+        return len(self.list)
 
 
 class Type(Node):
@@ -142,13 +162,13 @@ class Builtin(Type, NameNode):
 
 
 class Program(ListNode):
-    def __init__(self, list):
-        self.list = list
+    def __init__(self, definitions):
+        self.list = definitions
 
 
 class LetDef(ListNode):
-    def __init__(self, list, isRec=False):
-        self.list = list
+    def __init__(self, definitions, isRec=False):
+        self.list = definitions
         self.isRec = isRec
 
 
@@ -159,10 +179,10 @@ class ConstantDef(Def):
         self.type = type
 
 
-class FunctionDef(Def):
-    def __init__(self, name, params, body, type=None):
+class FunctionDef(ArgumentNode, Def):
+    def __init__(self, name, arguments, body, type=None):
         self.name = name
-        self.params = params
+        self.arguments = arguments
         self.body = body
         self.type = type
 
@@ -188,17 +208,17 @@ class UnaryExpression(Expression):
         self.type = None
 
 
-class ConstructorCallExpression(Expression, ListNode, NameNode):
-    def __init__(self, name, list):
+class ConstructorCallExpression(ArgumentNode, Expression, NameNode):
+    def __init__(self, name, arguments):
         self.name = name
-        self.list = list
+        self.arguments = arguments
         self.type = None
 
 
-class ArrayExpression(Expression, ListNode, NameNode):
-    def __init__(self, name, list):
+class ArrayExpression(ArgumentNode, Expression, NameNode):
+    def __init__(self, name, arguments):
         self.name = name
-        self.list = list
+        self.arguments = arguments
         self.type = None
 
 
@@ -243,10 +263,10 @@ class ForExpression(Expression):
         self.type = None
 
 
-class FunctionCallExpression(Expression, ListNode, NameNode):
-    def __init__(self, name, list):
+class FunctionCallExpression(ArgumentNode, Expression, NameNode):
+    def __init__(self, name, arguments):
         self.name = name
-        self.list = list
+        self.arguments = arguments
         self.type = None
 
 
@@ -265,10 +285,10 @@ class IfExpression(Expression):
         self.type = None
 
 
-class MatchExpression(Expression, ListNode):
-    def __init__(self, expr, list):
+class MatchExpression(Expression):
+    def __init__(self, expr, clauses):
         self.expr = expr
-        self.list = list
+        self.clauses = clauses
         self.type = None
 
 
@@ -278,10 +298,10 @@ class Clause(Node):
         self.expr = expr
 
 
-class Pattern(ListNode, NameNode):
-    def __init__(self, name, list=None):
+class Pattern(ArgumentNode, NameNode):
+    def __init__(self, name, arguments=None):
         self.name = name
-        self.list = list or []
+        self.arguments = arguments or []
 
 
 class GenidPattern(NameNode):
@@ -314,16 +334,16 @@ class ArrayVariableDef(VariableDef):
         self.type = type
 
 
-class TDef(ListNode):
-    def __init__(self, type, list):
+class TDef(ArgumentNode):
+    def __init__(self, type, arguments):
         self.type = type
-        self.list = list
+        self.arguments = arguments
 
 
-class Constructor(NameNode, ListNode):
-    def __init__(self, name, list=None):
+class Constructor(ArgumentNode, NameNode):
+    def __init__(self, name, arguments=None):
         self.name = name
-        self.list = list or []
+        self.arguments = arguments or []
 
 # == REPRESENTATION OF TYPES AS AST NODES ==
 
