@@ -307,7 +307,13 @@ class Analyzer:
         pass
 
     def analyze_delete_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(
+            expression.expr,
+            ast.Ref(self.inferer.make_new_type())
+        )
+        self.inferer.constrain_node_having_type(expression, ast.Unit())
+
+        self._dispatch(expression.expr)
 
     def analyze_dim_expression(self, expression):
         pass
