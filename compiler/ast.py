@@ -334,6 +334,11 @@ class ArrayVariableDef(VariableDef):
         self.type = type
 
 
+class TypeDef(ListNode):
+    def __init__(self, definitions):
+        self.list = definitions
+
+
 class TDef(ArgumentNode):
     def __init__(self, type, arguments):
         self.type = type
@@ -408,6 +413,7 @@ class Function(Type):
 
 
 # == BASE ERROR CLASS ==
+
 
 class NodeError(Exception):
 

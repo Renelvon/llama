@@ -504,7 +504,7 @@ class Parser:
 
     def p_typedef(self, p):
         """typedef : TYPE tdef_and_seq"""
-        p[0] = p[2]
+        p[0] = ast.TypeDef(p[2])
 
     def p_tdef_and_seq(self, p):
         """tdef_and_seq : tdef AND tdef_and_seq

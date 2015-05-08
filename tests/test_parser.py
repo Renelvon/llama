@@ -428,7 +428,9 @@ class TestParserRules(unittest.TestCase):
 
     def test_typedef(self):
         parse.quiet_parse("type color = Red", "typedef").should.equal(
-            [ast.TDef(ast.User("color"), [ast.Constructor("Red")])]
+            ast.TypeDef(
+                [ast.TDef(ast.User("color"), [ast.Constructor("Red")])]
+            )
         )
 
     def test_type_seq(self):
