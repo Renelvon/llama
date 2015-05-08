@@ -175,7 +175,8 @@ class Analyzer:
             self.logger.error(str(e))
 
     def analyze_constant_def(self, definition):
-        pass
+        self.inferer.constrain_nodes_equtyped(definition, definition.body)
+        self._dispatch(definition.body)
 
     def analyze_function_def(self, definition):
         scope = self.symbol_table.open_scope()
