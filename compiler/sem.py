@@ -9,7 +9,7 @@
 # ----------------------------------------------------------------------
 """
 
-from compiler import ast, error, symbol, typesem
+from compiler import ast, error, infer, symbol, typesem
 
 
 class Analyzer:
@@ -17,14 +17,16 @@ class Analyzer:
 
     def __init__(self, logger=None):
         """Initialize a new Analyzer."""
-        self.symbol_table = symbol.Table()
-        self.type_table = typesem.Table()
         if logger is None:
             self.logger = error.Logger()
         else:
             self.logger = logger
 
         self._initialize_dispatchers()
+
+        self.symbol_table = symbol.Table()
+        self.type_table = typesem.Table()
+        self.inferer = infer.Inferer(logger)
 
     def _initialize_dispatchers(self):
         self._initialize_general_dispatcher()
