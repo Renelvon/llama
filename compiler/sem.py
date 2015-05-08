@@ -297,7 +297,8 @@ class Analyzer:
         pass
 
     def analyze_const_expression(self, expression):
-        pass
+        # Intentionally empty
+        return
 
     def analyze_conid_expression(self, expression):
         pass
