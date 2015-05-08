@@ -210,7 +210,9 @@ class Analyzer:
         self.inferer.constrain_node_having_type(definition, definition.type)
 
     def analyze_param(self, param):
-        pass
+        # No additional type processing is needed than what takes place
+        # while analyzing the function definition.
+        return
 
     def analyze_unary_expression(self, expression):
         self._unop_dispatcher[expression.operator](expression)
