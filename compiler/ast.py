@@ -24,7 +24,7 @@ class Node(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def __init__(self):
-        pass
+        return
 
     def __eq__(self, other):
         """

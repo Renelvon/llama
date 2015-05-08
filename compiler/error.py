@@ -28,10 +28,10 @@ class LoggerInterface:
         self.warnings = 0
 
     def debug(self, fmt, *args):
-        pass
+        return
 
     def info(self, fmt, *args):
-        pass
+        return
 
     def warning(self, fmt, *args):
         self.warnings += 1

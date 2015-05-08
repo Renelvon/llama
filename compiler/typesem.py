@@ -131,7 +131,7 @@ class Table:
 
     def _validate_builtin(self, _):
         """A builtin type is always valid."""
-        pass
+        return
 
     def _validate_function(self, t):
         """
