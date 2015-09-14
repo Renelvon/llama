@@ -315,8 +315,8 @@ class TestParserRules(unittest.TestCase):
         parsed = parse.quiet_parse(expr, "expr")
         parsed.should.be.an(ast.BinaryExpression)
         parsed.operator.should.equal(operator)
-        parsed.leftOperand.should.equal(self.one)
-        parsed.rightOperand.should.equal(self.two)
+        parsed.left_operand.should.equal(self.one)
+        parsed.right_operand.should.equal(self.two)
 
     def _check_unary_operator(self, operator):
         expr = "%s 1" % operator

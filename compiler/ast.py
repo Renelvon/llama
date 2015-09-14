@@ -194,10 +194,10 @@ class Param(DataNode, NameNode):
 
 
 class BinaryExpression(Expression):
-    def __init__(self, leftOperand, operator, rightOperand):
-        self.leftOperand = leftOperand
+    def __init__(self, left_operand, operator, right_operand):
+        self.left_operand = left_operand
         self.operator = operator
-        self.rightOperand = rightOperand
+        self.right_operand = right_operand
         self.type = None
 
 

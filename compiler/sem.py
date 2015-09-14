@@ -239,12 +239,15 @@ class Analyzer:
 
     def _analyze_unop_expression_type1(self, expression, type_factory):
         self.inferer.constrain_node_having_type(expression, type_factory())
-        self.inferer.constrain_node_having_type(expression.operand, type_factory())
+        self.inferer.constrain_node_having_type(
+            expression.operand,
+            type_factory()
+        )
 
     def analyze_binary_expression(self, expression):
         self._binop_dispatcher[expression.operator](expression)
-        self._dispatch(expression.leftOperand)
-        self._dispatch(expression.rightOperand)
+        self._dispatch(expression.left_operand)
+        self._dispatch(expression.right_operand)
 
     def analyze_int_binop_expression(self, expression):
         self._analyze_binop_expression_type1(expression, ast.Int)
@@ -269,29 +272,29 @@ class Analyzer:
 
     def _analyze_binop_expression_type1(self, expression, type_factory):
         self.inferer.constrain_node_having_type(expression, type_factory())
-        for operand in (expression.leftOperand, expression.rightOperand):
+        for operand in (expression.left_operand, expression.right_operand):
             self.inferer.constrain_node_having_type(operand, type_factory())
 
     def _analyze_binop_expression_type2(self, expression, root_type_factory):
         self.inferer.constrain_node_having_type(expression, root_type_factory())
         self.inferer.constrain_nodes_equtyped(
-            expression.leftOperand,
-            expression.rightOperand
+            expression.left_operand,
+            expression.right_operand
         )
-        self.inferer.constrain_node_not_being_function(expression.leftOperand)
-        self.inferer.constrain_node_not_being_array(expression.leftOperand)
+        self.inferer.constrain_node_not_being_function(expression.left_operand)
+        self.inferer.constrain_node_not_being_array(expression.left_operand)
 
     def analyze_semicolon_expression(self, expression):
         self.inferer.constrain_nodes_equtyped(
             expression,
-            expression.rightOperand
+            expression.right_operand
         )
 
     def analyze_assign_expression(self, expression):
         self.inferer.constrain_node_having_type(expression, ast.Unit())
         self.inferer.constrain_node_having_type(
-            expression.leftOperand,
-            ast.Ref(self.inferer.get_type_handle(expression.rightOperand))
+            expression.left_operand,
+            ast.Ref(self.inferer.get_type_handle(expression.right_operand))
         )
 
     def analyze_constructor_call_expression(self, expression):
@@ -301,7 +304,7 @@ class Analyzer:
         pass
 
     def analyze_const_expression(self, expression):
-        # Intentionally empty
+        # Intentionally empty: the parser has already filled-in types.
         return
 
     def analyze_conid_expression(self, expression):
