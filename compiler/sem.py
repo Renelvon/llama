@@ -199,6 +199,8 @@ class Analyzer:
     def analyze_variable_def(self, definition):
         if definition.type is None:
             definition.type = ast.Ref(self.inferer.make_new_type())
+        else:
+            assert isinstance(definition.type, ast.Ref), 'Non-Ref variable'
         self.inferer.constrain_node_having_type(definition, definition.type)
 
     def analyze_array_variable_def(self, definition):
