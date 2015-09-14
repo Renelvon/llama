@@ -206,9 +206,11 @@ class Analyzer:
     def analyze_array_variable_def(self, definition):
         if definition.type is None:
             definition.type = ast.Array(
-                self.inferer.make_new_type()
+                self.inferer.make_new_type(),
                 definition.dimensions
             )
+        else:
+            assert isinstance(definition.type, ast.Array), 'Non-Array array'
         self.inferer.constrain_node_having_type(definition, definition.type)
 
     def analyze_param(self, param):
