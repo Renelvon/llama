@@ -71,7 +71,7 @@ class Analyzer:
 
             # NOTE: Some ast nodes are omitted, as they are
             # processed elsewhere. These include type annotations as
-            # well as type declarations.
+            # well as type definitions.
         }
 
     def _initialize_unop_dispatcher(self):
