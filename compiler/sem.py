@@ -435,7 +435,21 @@ class Analyzer:
         pass
 
     def analyze_new_expression(self, expression):
-        pass
+        if typesem.is_array(expression.type):
+            err = typesem.RefOfArrayError(expression)
+            self.logger.error(str(err))
+            return
+
+        try:
+            self.type_table.validate(expression.type)
+        except typesem.InvalidTypeError as err:
+            self.logger.error(str(err))
+            return
+
+        self.inferer.constrain_node_having_type(
+            expression,
+            ast.Ref(expression.type)
+        )
 
     def analyze_while_expression(self, expression):
         pass
