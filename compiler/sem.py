@@ -403,7 +403,11 @@ class Analyzer:
             self._dispatch(expr)
 
     def analyze_let_in_expression(self, expression):
-        pass
+        self._dispatch(expression.letdef)
+        self._dispatch(expression.expr)
+        self._close_scope()
+
+        self.inferer.constrain_nodes_equtyped(expression, expression.expr)
 
     def analyze_if_expression(self, expression):
         self.inferer.constrain_node_having_type(
