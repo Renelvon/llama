@@ -12,6 +12,21 @@
 from compiler import ast, error, infer, symbol, typesem
 
 
+class ArgumentCountMismatchError(ast.NodeError):
+
+    """
+    Exception thrown on detecting less or more arguments than expected.
+    """
+
+    @property
+    def _node_error_msg(self):
+        return "Argument count mismatch: actual %d" % len(self.node.arguments)
+
+    @property
+    def _prev_error_msg(self):
+        return " expected: %d" % len(self.prev.arguments)
+
+
 class Analyzer:
     """A semantic analyzer for Llama programs."""
 
@@ -305,7 +320,24 @@ class Analyzer:
         )
 
     def analyze_constructor_call_expression(self, expression):
-        pass
+        data = self.type_table.lookup_constructor(expression.name)
+        if data is None:
+            err = typesem.UndefConstructorError(expression)
+            self.logger.error(str(err))
+            return
+
+        constructor, user_type = data
+        self.inferer.constrain_node_having_type(expression, user_type)
+
+        if len(constructor) != len(expression):
+            err = ArgumentCountMismatchError(expression, constructor)
+            self.logger.error(str(err))
+        else:
+            for expr, arg_type in zip(expression, constructor):
+                self.inferer.constrain_node_having_type(expr, arg_type)
+
+        for expr in expression:
+            self._dispatch(expr)
 
     def analyze_array_expression(self, expression):
         new_type = self.inferer.make_new_type()

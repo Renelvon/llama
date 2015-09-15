@@ -228,7 +228,7 @@ class Table:
         Lookup the constructor named and retrieve stored info.
 
         If the constructor is found, a tuple is returned. The tuple
-        contains the definition node of that constructor and a the node
+        contains the definition node of that constructor and the node
         of the produced type, in that order. If the constructor doesn't
         exist, None is returned.
         """
