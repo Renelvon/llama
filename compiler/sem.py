@@ -304,7 +304,18 @@ class Analyzer:
         pass
 
     def analyze_array_expression(self, expression):
-        pass
+        new_type = self.inferer.make_new_type()
+        self.inferer.constrain_node_having_type(expression, ast.Ref(new_type))
+        self.inferer.constrain_node_having_type(
+            expression.name,
+            ast.Array(new_type, len(expression))
+        )
+        for expr in expression:
+            self.inferer.constrain_node_having_type(expr, ast.Int())
+
+        self._dispatch(expression.name)
+        for expr in expression:
+            self._dispatch(expr)
 
     def analyze_const_expression(self, expression):
         # Intentionally empty: the parser has already filled-in types.
