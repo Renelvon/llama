@@ -452,7 +452,15 @@ class Analyzer:
         )
 
     def analyze_while_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(expression, ast.Unit())
+        self.inferer.constrain_node_having_type(
+            expression.condition,
+            ast.Bool()
+        )
+        self.inferer.constrain_node_having_type(expression.body, ast.Unit())
+
+        self._dispatch(expression.condition)
+        self._dispatch(expression.body)
 
     def analyze_clause(self, clause):
         pass
