@@ -353,7 +353,19 @@ class Analyzer:
         pass
 
     def analyze_function_call_expression(self, expression):
-        pass
+        fun_type = result_type = self.inferer.make_new_type()
+        self.inferer.constrain_node_having_type(expression, result_type)
+        self.inferer.constrain_node_not_being_function(expression)
+
+        fun_type = self._abstract_fun_type_from_arguments(
+            fun_type,
+            expression.arguments
+        )
+        self.inferer.constrain_node_having_type(expression.name, fun_type)
+
+        self._dispatch(expression.name)
+        for expr in expression:
+            self._dispatch(expr)
 
     def analyze_let_in_expression(self, expression):
         pass
