@@ -183,11 +183,10 @@ class Analyzer:
 
     def analyze_function_def(self, definition):
         fun_type = self.inferer.get_type_handle(definition.body)
-        for param in reversed(definition.arguments):
-            fun_type = ast.Function(
-                self.inferer.get_type_handle(param),
-                fun_type
-            )
+        fun_type = self._abstract_fun_type_from_arguments(
+            fun_type,
+            definition.arguments
+        )
 
         self.inferer.constrain_node_having_type(definition, fun_type)
         self.inferer.constrain_node_not_being_function(definition.body)
@@ -198,6 +197,11 @@ class Analyzer:
             self._dispatch(param)
         self._dispatch(definition.body)
         self._close_scope()
+
+    def _abstract_fun_type_from_arguments(self, f_type, arguments):
+        for arg in reversed(arguments):
+            f_type = ast.Function(self.inferer.get_type_handle(arg), f_type)
+        return f_type
 
     def analyze_variable_def(self, definition):
         if definition.type is None:
