@@ -326,7 +326,13 @@ class Analyzer:
         self._dispatch(expression.expr)
 
     def analyze_dim_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(expression, ast.Int())
+        self.inferer.constrain_node_being_array_of_dimensions_at_least(
+            expression.name,
+            expression.dimension
+        )
+
+        self._dispatch(expression.name)
 
     def analyze_for_expression(self, expression):
         pass
