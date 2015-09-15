@@ -278,10 +278,10 @@ class LetInExpression(Expression):
 
 
 class IfExpression(Expression):
-    def __init__(self, condition, thenExpr, elseExpr=None):
+    def __init__(self, condition, then_expr, else_expr=None):
         self.condition = condition
-        self.thenExpr = thenExpr
-        self.elseExpr = elseExpr
+        self.then_expr = then_expr
+        self.else_expr = else_expr
         self.type = None
 
 

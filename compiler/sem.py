@@ -406,7 +406,26 @@ class Analyzer:
         pass
 
     def analyze_if_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(
+            expression.condition,
+            ast.Bool()
+        )
+        self.inferer.constrain_nodes_equtyped(expression, expression.then_expr)
+
+        self._dispatch(expression.condition)
+        self._dispatch(expression.then_expr)
+
+        if expression.else_expr is None:
+            self.inferer.constrain_node_having_type(
+                expression.then_expr,
+                ast.Unit()
+            )
+        else:
+            self.inferer.constrain_nodes_equtyped(
+                expression.then_expr,
+                expression.else_expr
+            )
+            self._dispatch(expression.else_expr)
 
     def analyze_match_expression(self, expression):
         pass
