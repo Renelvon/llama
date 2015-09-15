@@ -150,13 +150,13 @@ class Analyzer:
         else:
             self._analyze_norec_letdef(letdef)
 
-    def _analyze_rec_letdef(letdef):
+    def _analyze_rec_letdef(self, letdef):
         self._open_visible_scope()
         self._insert_symbols(letdef)
         for definition in letdef:
             self._dispatch(definition)
 
-    def _analyze_norec_letdef(letdef):
+    def _analyze_norec_letdef(self, letdef):
         new_scope = self._open_invisible_scope()
         for definition in letdef:
             self._dispatch(definition)
@@ -298,7 +298,10 @@ class Analyzer:
             self.inferer.constrain_node_having_type(operand, type_factory())
 
     def _analyze_binop_expression_type2(self, expression, root_type_factory):
-        self.inferer.constrain_node_having_type(expression, root_type_factory())
+        self.inferer.constrain_node_having_type(
+            expression,
+            root_type_factory()
+        )
         self.inferer.constrain_nodes_equtyped(
             expression.left_operand,
             expression.right_operand
