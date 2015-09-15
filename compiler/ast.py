@@ -254,12 +254,12 @@ class DimExpression(Expression, NameNode):
 
 
 class ForExpression(Expression):
-    def __init__(self, counter, startExpr, stopExpr, body, isDown=False):
+    def __init__(self, counter, start_expr, stop_expr, body, is_down=False):
         self.counter = counter
-        self.startExpr = startExpr
-        self.stopExpr = stopExpr
+        self.start_expr = start_expr
+        self.stop_expr = stop_expr
         self.body = body
-        self.isDown = isDown
+        self.is_down = is_down
         self.type = None
 
 

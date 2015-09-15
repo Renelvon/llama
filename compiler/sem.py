@@ -385,7 +385,28 @@ class Analyzer:
         self._dispatch(expression.name)
 
     def analyze_for_expression(self, expression):
-        pass
+        self.inferer.constrain_node_having_type(
+            expression.start_expr,
+            ast.Int()
+        )
+        self.inferer.constrain_node_having_type(
+            expression.stop_expr,
+            ast.Int()
+        )
+        self.inferer.constrain_node_having_type(
+            expression.counter,
+            ast.Int()
+        )
+        self.inferer.constrain_node_having_type(expression.body, ast.Unit())
+        self.inferer.constrain_node_having_type(expression, ast.Unit())
+
+        self._dispatch(expression.start_expr)
+        self._dispatch(expression.stop_expr)
+
+        self._open_visible_scope()
+        self._insert_symbol(expression.counter)
+        self._dispatch(expression.body)
+        self._close_scope()
 
     def analyze_function_call_expression(self, expression):
         fun_type = result_type = self.inferer.make_new_type()
