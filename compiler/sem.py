@@ -158,6 +158,9 @@ class Analyzer:
         new_scope.visible = False
         return new_scope
 
+    def _close_scope(self):
+        self.symbol_table.close_scope()
+
     def _insert_symbols(self, symbols):
         for sym in symbols:
             self._insert_symbol(sym)
@@ -189,12 +192,12 @@ class Analyzer:
         self.inferer.constrain_node_having_type(definition, fun_type)
         self.inferer.constrain_node_not_being_function(definition.body)
 
-        new_scope = self._open_visible_scope()
+        self._open_visible_scope()
         self._insert_symbols(definition.arguments)
         for param in definition.arguments:
             self._dispatch(param)
         self._dispatch(definition.body)
-        self.symbol_table.close_scope()
+        self._close_scope()
 
     def analyze_variable_def(self, definition):
         if definition.type is None:
