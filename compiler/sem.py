@@ -364,7 +364,14 @@ class Analyzer:
         pass
 
     def analyze_genid_expression(self, expression):
-        pass
+        definition = self.symbol_table.lookup_live_definition(expression.name)
+        if definition is None:
+            err = symbol.UndefIdentifierError(expression)
+            self.logger.error(str(err))
+            expression.def_link = None
+        else:
+            expression.def_link = definition
+            self.inferer.constrain_nodes_equtyped(expression, definition)
 
     def analyze_delete_expression(self, expression):
         self.inferer.constrain_node_having_type(
