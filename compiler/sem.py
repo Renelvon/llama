@@ -491,7 +491,10 @@ class Analyzer:
         self._dispatch(expression.body)
 
     def analyze_clause(self, clause):
-        pass
+        self._open_visible_scope()
+        self._dispatch(clause.pattern)
+        self._dispatch(clause.expr)
+        self._close_scope()
 
     def analyze_pattern(self, pattern):
         pass
