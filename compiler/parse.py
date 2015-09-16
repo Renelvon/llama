@@ -413,8 +413,8 @@ class Parser:
                           | iconst_simple_expr
                           | genid_simple_pattern
                           | mfconst_simple_pattern
-                          | miconst_simple_pattern
                           | pfconst_simple_pattern
+                          | miconst_simple_pattern
                           | piconst_simple_pattern"""
         if len(p) == 4:
             p[0] = p[2]
