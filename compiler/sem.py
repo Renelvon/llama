@@ -500,7 +500,7 @@ class Analyzer:
         pass
 
     def analyze_genid_pattern(self, pattern):
-        pass
+        self._insert_symbol(pattern)
 
 
 def analyze(program, logger=None):
