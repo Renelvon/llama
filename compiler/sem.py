@@ -460,7 +460,16 @@ class Analyzer:
             self._dispatch(expression.else_expr)
 
     def analyze_match_expression(self, expression):
-        pass
+        for clause in expression.clauses:
+            self.inferer.constrain_nodes_equtyped(
+                clause.pattern,
+                expression.expr
+            )
+            self.inferer.constrain_nodes_equtyped(clause.expr, expression)
+
+        self._dispatch(expression.expr)
+        for clause in expression.clauses:
+            self._dispatch(clause)
 
     def analyze_new_expression(self, expression):
         if typesem.is_array(expression.type):
