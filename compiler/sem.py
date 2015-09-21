@@ -361,7 +361,15 @@ class Analyzer:
         return
 
     def analyze_conid_expression(self, expression):
-        pass
+        data = self.type_table.lookup_constructor(expression.name)
+        if data is None:
+            err = typesem.UndefConstructorError(expression)
+            self.logger.error(str(err))
+            expression.def_link = None
+        else:
+            constructor, user_type = data
+            expression.def_link = constructor
+            self.inferer.constrain_node_having_type(expression, user_type)
 
     def analyze_genid_expression(self, expression):
         definition = self.symbol_table.lookup_live_definition(expression.name)
