@@ -28,6 +28,10 @@ class Analyzer:
         self.type_table = typesem.Table()
         self.inferer = infer.Inferer(logger)
 
+        self._dispatcher = None
+        self._binop_dispatcher = None
+        self._unop_dispatcher = None
+
     def _initialize_dispatchers(self):
         self._initialize_general_dispatcher()
         self._initialize_unop_dispatcher()
