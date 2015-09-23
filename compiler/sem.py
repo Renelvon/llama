@@ -323,10 +323,8 @@ class Analyzer:
         )
 
     def analyze_constructor_call_expression(self, expression):
-        data = self.type_table.lookup_constructor(expression.name)
+        data = self._get_constructor_info(expression.name)
         if data is None:
-            err = typesem.UndefConstructorError(expression)
-            self.logger.error(str(err))
             return
 
         constructor, user_type = data
@@ -341,6 +339,13 @@ class Analyzer:
 
         for expr in expression:
             self._dispatch(expr)
+
+    def _get_constructor_info(self, constructor):
+        data = self.type_table.lookup_constructor(constructor)
+        if data is None:
+            err = typesem.UndefConstructorError(constructor)
+            self.logger.error(str(err))
+        return data
 
     def analyze_array_expression(self, expression):
         new_type = self.inferer.make_new_type()
@@ -361,10 +366,8 @@ class Analyzer:
         return
 
     def analyze_conid_expression(self, expression):
-        data = self.type_table.lookup_constructor(expression.name)
+        data = self._get_constructor_info(expression.name)
         if data is None:
-            err = typesem.UndefConstructorError(expression)
-            self.logger.error(str(err))
             expression.def_link = None
         else:
             constructor, user_type = data
