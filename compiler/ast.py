@@ -298,10 +298,11 @@ class Clause(Node):
         self.expr = expr
 
 
-class Pattern(ArgumentNode, NameNode):
+class Pattern(ArgumentNode, NameNode, DataNode):
     def __init__(self, name, arguments=None):
         self.name = name
         self.arguments = arguments or []
+        self.type = None
 
 
 class GenidPattern(NameNode):
