@@ -517,7 +517,39 @@ class Analyzer:
         self._close_scope()
 
     def analyze_pattern(self, pattern):
-        pass
+        if len(pattern):
+            self._analyze_complex_pattern(pattern)
+        else:
+            self._analyze_simple_pattern(pattern)
+
+    def _analyze_simple_pattern(self, pattern):
+        data = self._get_constructor_info(pattern.name)
+        if data is None:
+            pattern.def_link = None
+            return
+
+        constructor, user_type = data
+        pattern.def_link = constructor
+        self.inferer.constrain_node_having_type(pattern, user_type)
+
+    def _analyze_complex_pattern(self, pattern):
+        data = self._get_constructor_info(pattern.name)
+        if data is None:
+            pattern.def_link = None
+            return
+
+        constructor, user_type = data
+        pattern.def_link = constructor
+        self.inferer.constrain_node_having_type(pattern, user_type)
+
+        if len(pattern) != len(constructor):
+            err = ArgumentCountMismatchError(pattern, constructor)
+            self.logger.error(str(err))
+            return
+
+        for subpat, subtype in zip(pattern, constructor):
+            self.inferer.constrain_node_having_type(subpat, subtype)
+            self._dispatch(subpat)
 
     def analyze_genid_pattern(self, pattern):
         self._insert_symbol(pattern)
