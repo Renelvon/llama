@@ -289,6 +289,7 @@ class Analyzer:
     def analyze_cmp_binop_expression(self, expression):
         self._analyze_binop_expression_type2(expression, ast.Bool)
         self.inferer.constrain_node_having_one_of_types(
+            expression.left_operand,
             (ast.Char(), ast.Int(), ast.Float())
         )
 
