@@ -41,7 +41,7 @@ class Analyzer:
 
         self.symbol_table = symbol.Table()
         self.type_table = typesem.Table()
-        self.inferer = infer.Inferer(logger)
+        self.inferer = infer.Inferer(self.type_table, logger)
 
         self._dispatcher = None
         self._binop_dispatcher = None
