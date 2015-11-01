@@ -220,17 +220,16 @@ class Analyzer:
 
     def analyze_variable_def(self, definition):
         if definition.type is None:
-            definition.type = ast.Ref(self.inferer.make_new_type())
+            new_type = self.inferer.make_new_type_referencing(definition)
+            definition.type = ast.Ref(new_type)
         else:
             assert isinstance(definition.type, ast.Ref), 'Non-Ref variable'
         self.inferer.constrain_node_having_type(definition, definition.type)
 
     def analyze_array_variable_def(self, definition):
         if definition.type is None:
-            definition.type = ast.Array(
-                self.inferer.make_new_type(),
-                definition.dimensions
-            )
+            new_type = self.inferer.make_new_type_referencing(definition)
+            definition.type = ast.Array(new_type, definition.dimensions)
         else:
             assert isinstance(definition.type, ast.Array), 'Non-Array array'
         self.inferer.constrain_node_having_type(definition, definition.type)
@@ -349,7 +348,7 @@ class Analyzer:
         return data
 
     def analyze_array_expression(self, expression):
-        new_type = self.inferer.make_new_type()
+        new_type = self.inferer.make_new_type_referencing(expression)
         self.inferer.constrain_node_having_type(expression, ast.Ref(new_type))
         self.inferer.constrain_node_having_type(
             expression.name,
@@ -386,9 +385,10 @@ class Analyzer:
             self.inferer.constrain_nodes_equtyped(expression, definition)
 
     def analyze_delete_expression(self, expression):
+        new_type = self.inferer.make_new_type_referencing(expression.expr)
         self.inferer.constrain_node_having_type(
             expression.expr,
-            ast.Ref(self.inferer.make_new_type())
+            ast.Ref(new_type)
         )
         self.inferer.constrain_node_having_type(expression, ast.Unit())
 
@@ -428,12 +428,12 @@ class Analyzer:
         self._close_scope()
 
     def analyze_function_call_expression(self, expression):
-        fun_type = result_type = self.inferer.make_new_type()
+        result_type = self.inferer.make_new_type_referencing(expression)
         self.inferer.constrain_node_having_type(expression, result_type)
         self.inferer.constrain_node_not_being_function(expression)
 
         fun_type = self._abstract_fun_type_from_arguments(
-            fun_type,
+            result_type,
             expression.arguments
         )
         self.inferer.constrain_node_having_type(expression.name, fun_type)
