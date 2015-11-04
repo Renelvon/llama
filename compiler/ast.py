@@ -158,6 +158,10 @@ class Builtin(Type, NameNode):
     def __init__(self):
         self.name = self.__class__.__name__.lower()
 
+    def __str__(self):
+        return self.name
+
+
 # == AST REPRESENTATION OF PROGRAM ELEMENTS ==
 
 
@@ -395,11 +399,28 @@ class Ref(Type):
     def __init__(self, type):
         self.type = type
 
+    def __str__(self):
+        fmt = '{0} ref' if isinstance(self.type, Builtin) else '({0}) ref'
+        return fmt.format(self.type)
+
 
 class Array(Type):
     def __init__(self, type, dimensions=1):
         self.type = type
         self.dimensions = dimensions
+
+    def __str__(self):
+        if self.dimensions > 1:
+            brackets = '[' + ','.join('*' * self.dimensions) + '] '
+        else:
+            brackets = ''
+
+        if isinstance(self.type, Builtin):
+            fmt = 'array {0}of {1}'
+        else:
+            fmt = 'array {0}of ({1})'
+
+        return fmt.format(brackets, self.type)
 
 
 def String():
@@ -411,6 +432,9 @@ class Function(Type):
     def __init__(self, fromType, toType):
         self.fromType = fromType
         self.toType = toType
+
+    def __str__(self):
+        return '(' + str(self.fromType) + ' -> ' + str(self.toType) + ')'
 
 
 # == BASE ERROR CLASS ==
