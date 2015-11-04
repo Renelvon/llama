@@ -339,6 +339,7 @@ class Inferer:
         self._resolve_constructive_constraints()
         self._ensure_concrete_mappings()
         self._resolve_nonconstructive_constraints()
+        self._write_back()
 
     def _resolve_constructive_constraints(self):
         while self._constructive_constraints:
@@ -450,6 +451,17 @@ class Inferer:
             ):
                 err = ArrayDimensionError(c.type1, c.size)
                 self.logger.error(str(err))
+
+    def _write_back(self):
+        for t, m in self._type_map.items():
+            mtype = m.type
+            try:
+                self._type_table.validate(mtype)
+            except typesem.InvalidTypeError as err:
+                self.logger.error(str(err))
+            else:
+                if t.node is not None:
+                    t.node.type = mtype
 
     # == TYPE MANAGEMENT ==
 
