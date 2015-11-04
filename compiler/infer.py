@@ -337,3 +337,16 @@ class Inferer:
 
 
 
+    # == TYPE MANAGEMENT ==
+
+    def get_type_handle(self, node):
+        if not isinstance(node.type, PartialType):
+            new_type = self.make_new_type_referencing(node)
+            new_type.node = node
+        return node.type
+
+    def make_new_type_referencing(self, node):
+        new_pt = PartialType()
+        new_pt.copy_pos(node)
+        self._type_map[new_pt] = UFTuple(node.type, 1)
+        return new_pt
