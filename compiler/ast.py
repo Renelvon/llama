@@ -15,6 +15,7 @@ import abc
 import collections.abc
 
 # pylint: disable=redefined-builtin
+# pylint: disable=too-many-ancestors
 # == INTERFACES OF AST NODES ==
 
 
