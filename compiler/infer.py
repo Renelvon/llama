@@ -9,7 +9,9 @@
 #          Dimitris Koutsoukos <dim.kou.shmmy@gmail.com>
 # ----------------------------------------------------------------------
 """
-from collections import namedtuple
+from collections import namedtuple, deque
+
+from compiler import ast, error
 
 
 class AbstractTypeError(Exception):
@@ -245,23 +247,93 @@ class PartialType:
         return hash(self.type_id)
 
 
-# == CONSTRAINTS ==
+class Inferer:
 
-# A constraint enforcing two PartialTypes to unify.
-EquConstraint = namedtuple('EquConstraint', type1, type2)
+    """
+    The type inference engine.
 
-# A constraint enforcing a PartialType to unify with one type
-# from a set of concrete types.
-# Note: This is actually only used in comparison operators.
-SetConstraint = namedtuple('SetConstraint', type1, good_set)
+    Designed for a Hindley-Milner-ish type system that includes
+    a couple of extensions for imperative programming, such
+    as references and arrays.
+    """
 
-# A constraint forbidding a PartialType from unifying with an
-# array type.
-NotArrayConstraint = namedtuple('NotArrayConstraint', type1)
+    # == CONSTRAINTS ==
 
-# A constraint forbidding a PartialType from unifying with a
-# function type.
-NotFuncConstraint = namedtuple('NotFuncConstraint', type1)
+    # A constraint enforcing two PartialTypes to unify.
+    EquConstraint = namedtuple('EquConstraint', ('type1', 'type2'))
 
-# A lower-bound constraint for the dimensions of an array.
-ArrayDimConstraint = namedtuple('ArrayDimConstraint', type1, dimension)
+    # A constraint enforcing a PartialType to unify with one type
+    # from a set of concrete types.
+    # Note: This is actually only used in comparison operators.
+    SetConstraint = namedtuple('SetConstraint', ('type1', 'good_set'))
+
+    # A constraint forbidding a PartialType from unifying with an
+    # array type.
+    NotArrayConstraint = namedtuple('NotArrayConstraint', ('type1',))
+
+    # A constraint forbidding a PartialType from unifying with a
+    # function type.
+    NotFuncConstraint = namedtuple('NotFuncConstraint', ('type1',))
+
+    # A lower-bound constraint for the dimensions of an array.
+    ArrayDimConstraint = namedtuple(
+        'ArrayDimConstraint',
+        ('type1', 'dimension')
+    )
+
+    # A tuple for the Union-Find engine.
+    UFTuple = namedtuple('UFTuple', ('type', 'size'))
+
+    def __init__(self, type_table, logger=None):
+        self._type_table = type_table
+        if logger is None:
+            self.logger = error.Logger()
+        else:
+            self.logger = logger
+
+        self._type_map = {}
+        self._constructive_constraints = deque()
+        self._set_constraints = []
+        self._not_func_constraints = []
+        self._not_array_constraints = []
+        self._array_dimensions_constraints = []
+
+    # == CONSTRAINT GENERATION ==
+
+    def constrain_nodes_equtyped(self, node1, node2):
+        self._constructive_constraints.append(
+            EquConstraint(
+                self.get_type_handle(node1),
+                self.get_type_handle(node2)
+            )
+        )
+
+    def constrain_node_having_type(self, node, concrete_type):
+        self._constructive_constraints.append(
+            EquConstraint(self.get_type_handle(node), concrete_type)
+        )
+
+    def constrain_node_having_one_of_types(self, node, concrete_types):
+        self._set_constraints.append(
+            SetConstraint(self.get_type_handle(node), concrete_types)
+        )
+
+    def constrain_node_being_array_of_dimensions_at_least(self, node, n):
+        self._array_dimensions_constraints.append(
+            ArrayDimConstraint(self.get_type_handle(node), n)
+        )
+
+    def constrain_node_not_being_function(self, node):
+        self._not_func_constraints.append(
+            NotFuncConstraint(self.get_type_handle(node))
+        )
+
+    def constrain_node_not_being_array(self, node):
+        self._not_array_constraints.append(
+            NotArrayConstraint(self.get_type_handle(node))
+        )
+
+
+
+
+
