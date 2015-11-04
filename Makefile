@@ -16,7 +16,8 @@ pylintcheck:
 flake8check:
 	flake8 --ignore=E221,N802 ./compiler/lex.py
 	flake8 --ignore=E501 ./compiler/parse.py
-	flake8 --ignore=N802,N803,N806 --exclude=lex.py,parse.py $(SOURCEFILES)
+	flake8 --ignore=F821 ./compiler/infer.py
+	flake8 --ignore=N802,N803,N806 --exclude=lex.py,parse.py,infer.py $(SOURCEFILES)
 	flake8 --ignore=E731,N802 --exclude=__init__.py $(TESTPATH)/*.py
 
 check: flake8check pylintcheck
