@@ -338,6 +338,7 @@ class Inferer:
     def resolve(self):
         self._resolve_constructive_constraints()
         self._ensure_concrete_mappings()
+        self._resolve_nonconstructive_constraints()
 
     def _resolve_constructive_constraints(self):
         while self._constructive_constraints:
@@ -417,6 +418,38 @@ class Inferer:
                 err = AbstractTypeError(t)
                 self.logger.error(str(err))
 
+    def _resolve_nonconstructive_constraints(self):
+        self._resolve_set_constraints()
+        self._resolve_not_func_constraints()
+        self._resolve_not_array_constraints()
+        self._resolve_array_dimensions_constraints()
+
+    def _resolve_set_constraints(self):
+        for c in self._set_constraints:
+            if not isinstance(c.type1, c.good_set):
+                err = BadSetTypeError(c.type1, c.good_set)
+                self.logger.error(str(err))
+
+    def _resolve_not_func_constraints(self):
+        for c in self._not_func_constraints:
+            if isinstance(c.type1, ast.Function):
+                err = TypeIsFunctionError(c.type1)
+                self.logger.error(str(err))
+
+    def _resolve_not_array_constraints(self):
+        for c in self._not_array_constraints:
+            if isinstance(c.type1, ast.Array):
+                err = TypeIsArrayError(c.type1)
+                self.logger.error(str(err))
+
+    def _resolve_array_dimensions_constraints(self):
+        for c in self._array_dimensions_constraints:
+            if not (
+                self._type_table.is_array(c.type1)
+                and (c.type1.dimensions >= c.size)
+            ):
+                err = ArrayDimensionError(c.type1, c.size)
+                self.logger.error(str(err))
 
     # == TYPE MANAGEMENT ==
 
@@ -475,3 +508,27 @@ class Inferer:
             return self._get_free_types(ttype.type)
         else:
             return []
+
+    def _upgrade_to_reps(self, ttype):
+        if isinstance(ttype, PartialType):
+            return self._find(ttype)
+        elif isinstance(ttype, ast.Function):
+            new_type = ast.Function(
+                self._upgrade_to_reps(ttype.fromType),
+                self._upgrade_to_reps(ttype.toType)
+            )
+            new_type.copy_pos(ttype)
+            return new_type
+        elif isinstance(ttype, ast.Ref):
+            new_type = ast.Ref(self._upgrade_to_reps(ttype.type))
+            new_type.copy_pos(ttype)
+            return new_type
+        elif isinstance(ttype, ast.Array):
+            new_type = ast.Array(
+                self._upgrade_to_reps(ttype.type),
+                ttype.dimensions
+            )
+            new_type.copy_pos(ttype)
+            return new_type
+        else:
+            return ttype
