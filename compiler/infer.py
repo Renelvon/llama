@@ -12,6 +12,182 @@
 from collections import namedtuple
 
 
+class AbstractTypeError(Exception):
+
+    """
+    Exception thrown on detecting an abstract type after inference.
+    """
+
+    _err_level = 'error: '
+
+    def __init__(self, type1):
+        """Create a new exception carrying the offending type and size."""
+        self.type1 = type1
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Cannot infer concrete instance for type {2}.'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1)
+        )
+
+
+class ArrayDimensionError(Exception):
+
+    """
+    Exception thrown on detecting an array of insufficient dimensions.
+    """
+
+    _err_level = 'error: '
+
+    def __init__(self, type1, size):
+        """Create a new exception carrying the offending type and size."""
+        self.type1 = type1
+        self.size = size
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Type {2} has less than {3} dimensions.'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1),
+            self.size
+        )
+
+
+class BadSetTypeError(Exception):
+
+    """Exception thrown on detecting a type outside a specified set."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1, bad_set):
+        """
+        Create a new exception carrying the offending type and the
+        expected set.
+        """
+        self.type1 = type1
+        self.bad_set = bad_set
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Type {2} is outside allowed set ({3})'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1),
+            ','.join(str(t) for t in self.bad_set)
+        )
+
+
+class IncompatibleTypesError(Exception):
+
+    """Exception thrown on detecting two types than cannot be unified."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1, type2):
+        """
+        Create a new exception carrying the offending type and the
+        expected set.
+        """
+        self.type1 = type1
+        self.type2 = type2
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Type {2} cannot be unified with {3}'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1),
+            str(self.type2),
+        )
+
+
+class IncompatibleArrayDimError(Exception):
+
+    """Exception thrown on two arrays of incompatible dimensions."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1, type2):
+        """
+        Create a new exception carrying the offending type and the
+        expected set.
+        """
+        self.type1 = type1
+        self.type2 = type2
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Dimension mismatch: cannot unify {2} with {3}'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1),
+            str(self.type2),
+        )
+
+
+class OccursInError(Exception):
+
+    """Exception thrown on detecting occurs-check violation."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1, type2):
+        """
+        Create a new exception carrying the offending type and the
+        expected set.
+        """
+        self.type1 = type1
+        self.type2 = type2
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Infinite type: {2} cannot be unified with {3}'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+            str(self.type1),
+            str(self.type2),
+        )
+
+
+class TypeIsArrayError(Exception):
+
+    """Exception thrown on detecting a forbidden array type."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1):
+        """Create a new exception carrying the offending type."""
+        self.type1 = type1
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Array type is forbidden for respective node.'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+        )
+
+
+class TypeIsFunctionError(Exception):
+
+    """Exception thrown on detecting a forbidden function type."""
+
+    _err_level = 'error: '
+
+    def __init__(self, type1):
+        """Create a new exception carrying the offending type."""
+        self.type1 = type1
+
+    def __str__(self):
+        """Format and return the exception's message."""
+        return '{0}{1}Function type is forbidden for respective node.'.format(
+            self.type1.pos_to_str(),
+            self._err_level,
+        )
+
+
 class PartialType:
 
     """
