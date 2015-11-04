@@ -9,89 +9,83 @@
 #          Dimitris Koutsoukos <dim.kou.shmmy@gmail.com>
 # ----------------------------------------------------------------------
 """
+from collections import namedtuple
 
 
-class TempType:
-    """A temporary type used during inference."""
+class PartialType:
 
-    _next_free = 1  # Next free papaki.
+    """
+    Special type denoting a not fully specified type.
+
+    This type is only used during semantic analysis.
+    """
+
+    id_count = 0
+    lineno = None
+    lexpos = None
+
+    def __init__(self, node=None):
+        """
+        Construct a new temporary type; the type may be optionally
+        bound to an AST `node`.
+        """
+        if node is not None:
+            assert isinstance(node, ast.DataNode), \
+                'Cannot make PartialType for untyped AST node.'
+            self.node = node
+
+        self.type_id = self._get_next_id()
+
+    def copy_pos(self, node):
+        """Copy line info from another AST node."""
+        self.lineno = node.lineno
+        self.lexpos = node.lexpos
+
+    def pos_to_str(self):
+        """Return node position as a string."""
+        if self.node is not None:
+            return self.node.pos_to_str()
+        elif self.lineno is None:
+            return ''
+        elif self.lexpos is None:
+            return '%d:' % self.lineno
+        else:
+            return "%d:%d:" % (self.lineno, self.lexpos)
 
     @classmethod
-    def _get_next_tag(cls):
-        cls._next_free += 1
-        return cls._next_free
+    def _get_next_id(cls):
+        cls.id_count += 1
+        return cls.id_count
 
-    def __init__(self, node, spec_type=None):
-        """
-        Construct a new temporary type for node `node`.
+    def __str__(self):
+        return '@' + self.type_id
 
-        The user may optionally supply a type for this node;
-        such a specification is not binding but will improve
-        error reporting.
-        """
-        self._node = node
-        self._spec_type = spec_type
-        self._inferred_type = None
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return self.type_id == other.type_id
+        return False
 
-        self._tag = self._get_next_tag()
-
-    def write_back(self):
-        self._node.type = self._inferred_type
-        # TODO: Validate the type before returning.
+    def __hash__(self):
+        return hash(self.type_id)
 
 
-class Constraint:
-    """
-    A type constraint.
+# == CONSTRAINTS ==
 
-    Subclasses specify what kind of constraint this one really is.
-    """
-    pass
+# A constraint enforcing two PartialTypes to unify.
+EquConstraint = namedtuple('EquConstraint', type1, type2)
 
+# A constraint enforcing a PartialType to unify with one type
+# from a set of concrete types.
+# Note: This is actually only used in comparison operators.
+SetConstraint = namedtuple('SetConstraint', type1, good_set)
 
-class SpecConstraint(Constraint):
-    """
-    A constraint enforcing a TempType to acquire a specific type.
-    """
+# A constraint forbidding a PartialType from unifying with an
+# array type.
+NotArrayConstraint = namedtuple('NotArrayConstraint', type1)
 
-    def __init__(self, ttype, spec_type):
-        self.ttype = ttype
-        self.spec_type = spec_type
+# A constraint forbidding a PartialType from unifying with a
+# function type.
+NotFuncConstraint = namedtuple('NotFuncConstraint', type1)
 
-
-class SetConstraint(Constraint):
-    """
-    A constraint enforcing a TempType to acquire a value from a given set.
-
-    These constraints are due to the type system.
-
-    Note: This is actually only used in comparison operators.
-    """
-
-    def __init__(self, ttype, good_types):
-        self.ttype = ttype
-        self.good_types = good_types
-
-
-class NegSetConstraint(Constraint):
-    """
-    A constraint forbidding a TempType from acquring certain types.
-
-    These constraints are due to the type system.
-    """
-
-    def __init__(self, ttype, bad_types):
-        self.ttype = ttype
-        self.bad_types = bad_types
-
-
-class AsTypeOfConstraint(Constraint):
-    """
-    A constraint enforcing two TempTypes to have the same type.
-
-    See the Haskell Prelude for hints.
-    """
-
-    def __init__(self, ttype1, ttype2):
-        self.ttype1 = ttype1
-        self.ttype2 = ttype2
+# A lower-bound constraint for the dimensions of an array.
+ArrayDimConstraint = namedtuple('ArrayDimConstraint', type1, dimension)
