@@ -257,6 +257,7 @@ class Inferer:
     as references and arrays.
     """
 
+    # pylint: disable=undefined-variable
     # pylint: disable=too-many-instance-attributes
     # == CONSTRAINTS ==
 
