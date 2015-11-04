@@ -337,6 +337,7 @@ class Inferer:
 
     def resolve(self):
         self._resolve_constructive_constraints()
+        self._ensure_concrete_mappings()
 
     def _resolve_constructive_constraints(self):
         while self._constructive_constraints:
@@ -408,6 +409,13 @@ class Inferer:
         self._constructive_constraints.appendleft(
             EquConstraint(type1.type, type2.type)
         )
+
+    def _ensure_concrete_mappings(self):
+        for t, m in self._type_map.items():
+            mtype = m.type
+            if mtype is None or isinstance(mtype, PartialType):
+                err = AbstractTypeError(t)
+                self.logger.error(str(err))
 
 
     # == TYPE MANAGEMENT ==
