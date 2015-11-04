@@ -257,6 +257,7 @@ class Inferer:
     as references and arrays.
     """
 
+    # pylint: disable=too-many-instance-attributes
     # == CONSTRAINTS ==
 
     # A constraint enforcing two PartialTypes to unify.
