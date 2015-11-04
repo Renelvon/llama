@@ -333,8 +333,81 @@ class Inferer:
             NotArrayConstraint(self.get_type_handle(node))
         )
 
+    # == CONSTRAINT RESOLUTION ==
 
+    def resolve(self):
+        self._resolve_constructive_constraints()
 
+    def _resolve_constructive_constraints(self):
+        while self._constructive_constraints:
+            c = self._constructive_constraints.popleft()
+            self._unify(c.type1, c.type2)
+
+    def _unify(self, type1, type2):
+        ftype1, ftype2 = self._find(type1), self._find(type2)
+        if isinstance(ftype1, PartialType):
+            if isinstance(ftype2, PartialType):
+                self._unify_partial_partial(ftype1, ftype2)
+            else:
+                self._unify_partial_concrete(ftype1, ftype2)
+        elif isinstance(ftype2, PartialType):
+            self._unify_partial_concrete(ftype2, ftype1)
+        else:
+            self._unify_concrete_concrete(ftype1, ftype1)
+
+    def _unify_partial_partial(self, type1, type2):
+        if type1 != type2:
+            self._link_to(type1, type2)
+
+    def _unify_partial_concrete(self, type1, type2):
+        if self._occurs_in(type1, type2):
+            err = OccursInError(
+                self._find(type1),
+                self._upgrade_to_reps(type2)
+            )
+            self.logger.error(str(err))
+        else:
+            self._type_map[type1] = UFTuple(type2, 1)
+
+    def _unify_concrete_concrete(self, type1, type2):
+        if not isinstance(type1, type2):
+            err = IncompatibleTypesError(type1, type2)
+            self.logger.error(str(err))
+        elif isinstance(type1, ast.Array):
+            self._unify_array(type1, type2)
+        elif isinstance(type1, ast.Function):
+            self._unify_function(type1, type2)
+        elif isinstance(type1, ast.Ref):
+            self._unify_ref(type1, type2)
+        else:
+            self._unify_builtin(type1, type2)
+
+    def _unify_array(self, type1, type2):
+        if type1.dimensions != type2.dimensions:
+            err = IncompatibleArrayDimError(type1, type2)
+            self.logger.error(str(err))
+        else:
+            self._constructive_constraints.appendleft(
+                EquConstraint(type1.type, type2.type)
+            )
+
+    def _unify_builtin(self, type1, type2):
+        if type1.name != type2.name:
+            err = IncompatibleTypesError(type1, type2)
+            self.logger.error(str(err))
+
+    def _unify_function(self, type1, type2):
+        self._constructive_constraints.appendleft(
+            EquConstraint(type1.fromType, type2.fromType)
+        )
+        self._constructive_constraints.appendleft(
+            EquConstraint(type1.toType, type2.toType)
+        )
+
+    def _unify_ref(self, type1, type2):
+        self._constructive_constraints.appendleft(
+            EquConstraint(type1.type, type2.type)
+        )
 
 
     # == TYPE MANAGEMENT ==
@@ -350,3 +423,47 @@ class Inferer:
         new_pt.copy_pos(node)
         self._type_map[new_pt] = UFTuple(node.type, 1)
         return new_pt
+
+    # == AUXILIARY METHODS ==
+
+    def _find(self, base_type):
+        # Optimize: Path compression
+        children = []
+        while isinstance(base_type, PartialType):
+            next_type = self._type_map[base_type].type
+            if next_type is None:
+                break
+            else:
+                children.append(base_type)
+                base_type = next_type
+        for c in children:
+            self._link_to(c, base_type)
+        return base_type
+
+    def _link_to(self, type1, type2):
+        sz1, sz2 = self._type_map[type1].size, self._type_map[type2].size
+        if sz1 <= sz2:  # Weighted-Union
+            self._type_map[type1] = UFTuple(type2, sz1)
+            self._type_map[type2] = UFTuple(None, sz1 + sz2)
+        else:
+            self._type_map[type2] = UFTuple(type1, sz2)
+            self._type_map[type1] = UFTuple(None, sz1 + sz2)
+
+    def _occurs_in(self, type1, type2):
+        assert isinstance(type1, PartialType), 'Bad logic'
+        free_types2 = self._get_free_types(type2)
+        ftype1 = self._find(type1)
+        return any(ftype1 == self._find(ft) for ft in free_types2)
+
+    def _get_free_types(self, ttype):
+        # TODO: Optimize
+        if isinstance(ttype, PartialType):
+            return [ttype]
+        elif isinstance(ttype, ast.Function):
+            free1 = self._get_free_types(ttype.fromType)
+            free2 = self._get_free_types(ttype.toType)
+            return free1 + free2
+        elif isinstance(ttype, (ast.Ref, ast.Array)):
+            return self._get_free_types(ttype.type)
+        else:
+            return []
