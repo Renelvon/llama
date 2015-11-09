@@ -6,6 +6,9 @@ language: python
 python:
     - "3.4"
 
+before_install:
+    - sudo apt-get -qq update
+    - sudo apt-get -y install libllvm3.5 llvm-3.5 llvm-3.5-dev llvm-3.5-runtime libedit-dev
 
 cache: pip
 
