@@ -133,7 +133,7 @@ double llama_float_of_int(int n){
 }
 
 int llama_int_of_float(double d){
-    return (double)d;
+    return (int)trunc(d);
 }
 
 int llama_round(double n){
