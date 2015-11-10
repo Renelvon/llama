@@ -1,39 +1,54 @@
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h> 
 
 typedef void unit;
 
+// ERROR REPORTING
+unit check_err(int ret, const char *s) {
+    if (ret < 0){
+        perror(s);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// PRINTING TO STDOUT
 unit print_int(int n){
-    printf("%d", n);
+    int ret = printf("%d", n);
+    check_err(ret, __func__);
 }
 
 unit print_bool(bool b){
-    if (b)
-        printf("true");
-    else
-        printf("false");
+    int ret = b ? printf("true") : printf("false");
+    check_err(ret, __func__);
 }
 
 unit print_char(char c){
-    printf("%c", c);
+    int ret = putchar(c);
+    check_err(ret, __func__);
 }
 
 unit print_float(double d){
-    printf("%lf", d);
+    int ret = printf("%lf", d);
+    check_err(ret, __func__);
 }
 
 unit print_string(const char* s){
-    printf("%s", s);
+    int ret = printf("%s", s);
+    check_err(ret, __func__);
 }
 
+// READING FROM STDIN
 int read_int(){
-    int n;
-    scanf("%d", &n);
+    int n, ret;
+    ret = scanf("%d", &n);
+    check_err(ret, __func__);
     return n;
 }
 
 bool read_bool(){
+    // TODO: This should probably read a string, not an int.
     int n;
     bool b;
     scanf("%d", &n);
@@ -42,12 +57,15 @@ bool read_bool(){
 }
 
 char read_char(){
-    return (char)getchar();
+    int ret = getchar();
+    check_err(ret, __func__);
+    return (char)ret;
 }
 
 double read_float(){
     double d;
-    scanf("%lf", &d);
+    int ret = scanf("%lf", &d);
+    check_err(ret, __func__);
     return d;
 }
 
@@ -61,6 +79,7 @@ unit read_string(char* s, int n){
     }
 }
 
+// BASIC MATH
 int abs(int n){
     return abs(n);
 }
