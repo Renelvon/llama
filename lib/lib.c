@@ -1,7 +1,8 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h> 
+#include <string.h>
 
 typedef void unit;
 
@@ -155,4 +156,22 @@ char llama_char_of_int(int n){
     return (char)n;
 }
 
+// STRING MANIPULATION
+int llama_strlen(const char *s) {
+    return strlen(s);
+}
 
+int llama_strcmp(const char *s1, const char *s2){
+    // TODO: use strncmp
+    return strcmp(s1, s2);
+}
+
+unit llama_strcpy(char *s1, const char *s2){
+    // TODO: use strncpy
+    (void)strcpy(s1, s2);
+}
+
+unit llama_strcat(char *s1, const char *s2){
+    // TODO: use strncat
+    (void)strcat(s1, s2);
+}
