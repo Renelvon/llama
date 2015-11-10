@@ -69,14 +69,21 @@ double llama_read_float(){
     return d;
 }
 
-unit llama_read_string(char* s, int n){
-    char temp;
-    
-    for(int i = 0; i < n; ++i){
-        temp = (char)getchar();
-        if (temp != '\n')
-            s[i] = temp;
+unit llama_read_string(char *s, int n){
+    for (unsigned int i = 0; i < n - 1; ++i){
+        int ret = getchar();
+        if (EOF == ret) {
+            break;
+        }
+        check_err(ret, __func__);
+        char temp = ret;
+        if (temp == '\n') {
+            s[i] = '\0';
+            break;
+        }
+        s[i] = temp;
     }
+    s[n - 1] = '\0';
 }
 
 // BASIC MATH
