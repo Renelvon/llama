@@ -1,6 +1,4 @@
-#include "lib.h"
-
-typedef void unit;
+#include "libllama.h"
 
 // ERROR REPORTING
 unit check_err(int ret, const char *s) {

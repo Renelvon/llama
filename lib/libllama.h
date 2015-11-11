@@ -1,6 +1,6 @@
 /**
  * ----------------------------------------------------------------------
- * lib.h
+ * libllama.h
  *
  * Llama standard library headers
  * http://courses.softlab.ntua.gr/compilers/2012a/llama2012.pdf
@@ -10,8 +10,8 @@
  * ----------------------------------------------------------------------
  */
 
-#ifndef _LLAMA_LIB_H
-#define _LLAMA_LIB_H
+#ifndef _LIB_LLAMA_H
+#define _LIB_LLAMA_H
 
 #include <math.h>
 #include <stdbool.h>
@@ -64,4 +64,4 @@ int llama_strcmp(const char *s1, const char *s2);
 unit llama_strcpy(char *s1, const char *s2);
 unit llama_strcat(char *s1, const char *s2);
 
-#endif /* _LLAMA_LIB_H */
+#endif /* _LIB_LLAMA_H */
