@@ -33,7 +33,7 @@ int llama_read_int();
 bool llama_read_bool();
 char llama_read_char();
 double llama_read_float();
-unit llama_read_string(char *s, int n);
+unit llama_read_string(char *s, size_t n);
 
 // BASIC MATH
 int llama_abs(int n);

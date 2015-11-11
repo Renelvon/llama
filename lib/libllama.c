@@ -64,7 +64,7 @@ double llama_read_float(){
     return d;
 }
 
-unit llama_read_string(char *s, int n){
+unit llama_read_string(char *s, size_t n){
     for (unsigned int i = 0; i < n - 1; ++i){
         int ret = getchar();
         if (EOF == ret) {
