@@ -9,3 +9,5 @@ py3env
 *.pyo
 *.pyc
 env/
+lib/*.o
+lib/libtest
