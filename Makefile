@@ -4,9 +4,10 @@ OPT=-OO
 SOURCEFILES=main.py ./compiler/*.py
 TABLEPATH=./tables
 BINPATH=./bin
+LIBPATH=./lib
 TESTPATH=./tests
 
-.PHONY: check clean flake8check functionaltest prepare pylintcheck test unittest
+.PHONY: check clean flake8check functionaltest libtest prepare pylintcheck test unittest
 
 all: clean check prepare test
 
@@ -21,10 +22,13 @@ flake8check:
 
 check: flake8check pylintcheck
 
-test: unittest functionaltest
+test: unittest libtest functionaltest
 
 unittest:
 	nosetests --with-coverage --cover-package=compiler --cover-inclusive
+
+libtest:
+	cd $(LIBPATH) && $(MAKE) test
 
 functionaltest: $(BINPATH)/ftest.sh
 	$(BINPATH)/ftest.sh
@@ -34,4 +38,5 @@ prepare:
 	$(BINPATH)/ctest.sh
 
 clean:
-	$(RM) $(TABLEPATH)/*.py $(TABLEPATH)/parser.out .coverage
+	$(RM) $(TABLEPATH)/*.py $(TABLEPATH)/parser.out $(BINPATH)/libtest .coverage
+	cd $(LIBPATH) && $(MAKE) clean
