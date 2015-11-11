@@ -1,7 +1,7 @@
 #include "libllama.h"
 
 // ERROR REPORTING
-unit check_err(int ret, const char *s) {
+static unit check_err(int ret, const char *s) {
     if (ret < 0){
         perror(s);
         exit(EXIT_FAILURE);
