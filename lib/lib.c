@@ -1,20 +1,4 @@
-/**
- * ----------------------------------------------------------------------
- * lib.c
- *
- * Llama standard library
- * http://courses.softlab.ntua.gr/compilers/2012a/llama2012.pdf
- *
- * Authors: Dimitris Koutsoukos <dim.kou.shmmy@gmail.com>
- *          Nick Korasidis <renelvon@gmail.com>
- * ----------------------------------------------------------------------
- */
-
-#include <math.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "lib.h"
 
 typedef void unit;
 
